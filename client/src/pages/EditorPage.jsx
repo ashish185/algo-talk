@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import Client from "./components/Client";
+import EditorPane from "./components/Editor";
+import "codemirror/mode/javascript/javascript";
+import Editor from "./components/Editor";
 
 const data = [
   { socketId: 1, userName: "Kavi" },
@@ -8,7 +11,7 @@ const data = [
   { socketId: 4, userName: "Ramesh" },
 ];
 
-const Editor = () => {
+const EditorPage = () => {
   const [clientData, setClientData] = useState(data);
   return (
     <div className="container-fluid vh-100 text-light">
@@ -39,12 +42,12 @@ const Editor = () => {
             <button className="btn btn-danger">Leave room</button>
           </div>
         </section>
-        <section className="col-md-10 text-light d-flex flex-column h-100">
-          Members
+        <section className="col-10 col-md-10 text-light d-flex flex-column h-100">
+          <Editor />
         </section>
       </div>
     </div>
   );
 };
 
-export default Editor;
+export default EditorPage;
