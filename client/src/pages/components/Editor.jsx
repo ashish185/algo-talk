@@ -1,23 +1,45 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import "codemirror/mode/javascript/javascript";
-import "codemirror/lib/codemirror";
-import CodeMirror from 'codemirror';
+import "codemirror/theme/dracula.css";
+import "codemirror/addon/edit/closetag";
+import "codemirror/addon/edit/closebrackets";
+import "codemirror/lib/codemirror.css";
+import CodeMirror from "codemirror";
 
-const Editor = () => {
+function Editor({ socketRef, roomId, onCodeChange }) {
+  const editorRef = useRef(null);
+
   useEffect(() => {
-    const init= async ()=> {
-      CodeMirror.fromTextArea();
-    }
+    const initCodeMirror = () => {
+      const textarea = document.getElementById("realtimeEditor");
+      editorRef.current = CodeMirror.fromTextArea(textarea, {
+        mode: { name: "javascript", json: true },
+        theme: "dracula",
+        autoCloseTags: true,
+        autoCloseBrackets: true,
+        lineNumbers: true,
+      });
+      if (editorRef.current) {
+        editorRef.current.setSize(null, '100%');
+      }
+    };
+  
+
+    initCodeMirror();
+
+    // Cleanup CodeMirror instance and event listeners on component unmount
+    return () => {
+      if (editorRef.current) {
+        editorRef.current.toTextArea();
+      }
+    };
   }, []);
 
   return (
-    <div style={{ height: "100%", width: "100%" }}>
-      <textarea
-        style={{ height: "100%", width: "100%" }}
-        id="editor_pane00"
-      ></textarea>
+    <div style={{ height: "100%" }}>
+      <textarea id="realtimeEditor" style={{ height: "100%" }}></textarea>
     </div>
   );
-};
+}
 
 export default Editor;

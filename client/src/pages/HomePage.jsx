@@ -1,9 +1,24 @@
 import React from "react";
 import { USER_CONFIG } from "../config";
+import { useState } from "react";
+import { v4 as uuid } from 'uuid';
+import toast from 'react-hot-toast';
+const notify = () => toast.success('Here is your toast.');
 
 const HomePage = () => {
+  const [roomId, setRoomId] = useState('');
+
   const { input_field_1, input_field_2, btn_field_1, p_field_1 } =
     USER_CONFIG.homePage.rooms.byIds;
+
+
+  const onGenerateClick = (event) => {
+    event.preventDefault();
+    const id = uuid();
+    setRoomId(id);
+    notify();
+  }
+
   return (
     <div className="container-fluid">
       <div className="row justify-content-center align-items-center min-vh-100">
@@ -20,9 +35,11 @@ const HomePage = () => {
               </div>
               <form className="form-group">
                 <input
+                  value={roomId}
                   type={input_field_1.text}
                   className="form-control mb-2"
                   placeholder={input_field_1.placeHolder}
+                  onChange={(e) => setRoomId(e.target.value)}
                 />
                 <input
                   type={input_field_2.text}
@@ -30,7 +47,7 @@ const HomePage = () => {
                   placeholder={input_field_2.placeHolder}
                 />
               </form>
-              <button className="btn btn-success btn-lg">
+              <button className="btn btn-success btn-lg" onClick={onGenerateClick}>
                 {btn_field_1.name}
               </button>
               <p className="mt-2 text-light">
