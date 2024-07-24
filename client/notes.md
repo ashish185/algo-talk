@@ -25,4 +25,10 @@ npm start
 4. Import bootstrap
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+5. In server package.json why are we using nodemon?
+Ans: Nodemon helps to run js file continuosly for continuous changes.
+
+6. .env file is created
+Ans:REACT_APP_SERVER_URL, it should start with REACT_APP. when this is changed you need to restart server
+
 

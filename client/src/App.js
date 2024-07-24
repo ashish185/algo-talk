@@ -9,7 +9,7 @@ function App() {
       <Toaster />
       <Routes>
         <Route path='/' element={<HomePage />} />
-        <Route path='/editor' element={<EditorPage />} />
+        <Route path='/editor/:roomId' element={<EditorPage />} />
       </Routes>
     </Router>
   );

@@ -1,0 +1,50 @@
+import express from 'express';
+import http from 'http';
+import { Server } from 'socket.io';
+
+const httpServer = http.createServer(express());
+const io = new Server(httpServer);
+
+const socketIdUserNameMap = {};
+
+const getAllConnectedUserName = (roomId) => {
+    const setOfSocketsId = io.sockets.adapter.rooms.get(roomId); //It will set of socket Ids Ex {'lRNNZxMVTdQ37dd7AAAI',}
+    console.log('setOfSocketsId', setOfSocketsId);
+    const mappedArr = [...setOfSocketsId].map(socketId => ({
+        socketId,
+        userName: socketIdUserNameMap[socketId]
+    }));
+    return mappedArr;
+}
+
+io.on('connection', (socket) => {
+    socket.on('join', ({ roomId, userName }) => {
+        socket.join(roomId); //If same id exists it joins with rooms, otherwise not exists then create it.
+        console.log('connection socket id', socket.id);
+        socketIdUserNameMap[socket.id] = userName;
+        const clients = getAllConnectedUserName(roomId);
+        clients.forEach(({ socketId }) => io.to(socketId).emit('joined',{
+            clients,
+            userName,
+            socketId
+        }));
+        console.log('clients', clients);
+    })
+
+    socket.on('disonnecting', () => {
+        const rooms = [...socket.rooms];
+        rooms.forEach((roomId)=> {
+            socket.in(roomId).emit('disconnected', {
+                socketId: socket.id, userName: socketIdUserNameMap[socket.id]
+            })
+        });
+        delete socketIdUserNameMap[socket.id];
+        socket.leave();
+    });
+})
+
+const PORT = process.env.PORT || 5000;
+
+httpServer.listen(PORT, () => {
+    console.log('Server is running');
+})
