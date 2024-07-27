@@ -1,6 +1,14 @@
 import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
+const ACTIONS = {
+    JOIN: "join",
+    JOINED: "joined",
+    DISCONNECTED: "disconnected",
+    CODE_CHANGE: "code-change",
+    SYNC_CODE: "sync-code",
+    LEAVE: "leave",
+  };
 
 const httpServer = http.createServer(express());
 const io = new Server(httpServer);
@@ -23,7 +31,7 @@ io.on('connection', (socket) => {
         console.log('connection socket id', socket.id);
         socketIdUserNameMap[socket.id] = userName;
         const clients = getAllConnectedUserName(roomId);
-        clients.forEach(({ socketId }) => io.to(socketId).emit('joined',{
+        clients.forEach(({ socketId }) => io.to(socketId).emit('joined', {
             clients,
             userName,
             socketId
@@ -31,11 +39,22 @@ io.on('connection', (socket) => {
         console.log('clients', clients);
     })
 
-    socket.on('disonnecting', () => {
+    // sync the code
+    socket.on(ACTIONS.CODE_CHANGE, ({ roomId, code }) => {
+        socket.in(roomId).emit(ACTIONS.CODE_CHANGE, { code });
+    });
+
+    socket.on(ACTIONS.SYNC_CODE, ({ socketId, code }) => {
+        console.log('sync code at server', code);
+        io.to(socketId).emit(ACTIONS.CODE_CHANGE, { code });
+    });
+
+    socket.on('disconnecting', () => {
         const rooms = [...socket.rooms];
-        rooms.forEach((roomId)=> {
+        rooms.forEach((roomId) => {
             socket.in(roomId).emit('disconnected', {
-                socketId: socket.id, userName: socketIdUserNameMap[socket.id]
+                socketId: socket.id,
+                userName: socketIdUserNameMap[socket.id]
             })
         });
         delete socketIdUserNameMap[socket.id];

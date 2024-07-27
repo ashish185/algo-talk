@@ -6,6 +6,7 @@ import { initSocket } from "../socket";
 import { Navigate, useLocation, useParams } from "react-router-dom";
 import CONSTATNS from "../constants";
 import toast from 'react-hot-toast';
+import ACTIONS from "../client-actions";
 
 const data = [
   { socketId: 1, userName: "Kavi" },
@@ -16,6 +17,7 @@ const data = [
 
 const EditorPage = () => {
   const socketRef = useRef();
+  const codeRef = useRef(null);
   const [clientData, setClientData] = useState([]);
   const location = useLocation();
   console.log('location.state', location.state);
@@ -42,19 +44,43 @@ const EditorPage = () => {
       socketRef.current.on('joined', ({ clients, userName, socketId }) => {
         console.log('list of clients at UI', clients, userName, socketId);
         if(location?.state?.userName !== userName){
-          toast.success(`New user:${userName} joined`)
+          toast.success(`${userName} joined`);
         }
+        setClientData(clients);
+        socketRef.current.on(ACTIONS.SYNC_CODE, {
+          socketId,
+          code: codeRef.current
+        });
       });
 
-      socketRef.current.on('disconnected', ({ socketId, userName }) => {
-        toast.success(`${userName} left`)
-        // setClientData((state) => {
-        //   return state.filter(obj => obj.socketId !== socketId);
-        // });
+      socketRef.current.on("disconnected", ({ socketId, userName }) => {
+        console.log("disconnected event", { socketId, userName });
+        toast.success(`${userName} left`);
+        setClientData((previousClientData) => {
+          return previousClientData.filter((obj) => obj.socketId !== socketId);
+        });
       });
     };
     init();
+    return ()=> {
+      socketRef.current.disconnect();
+      socketRef.current.off('joined');
+      socketRef.current.off("disconnected");
+    }
   }, [])
+
+  const copyRoomId= ()=>{
+    const roomId = params?.roomId;
+    navigator.clipboard.writeText(roomId).then(() => {
+      toast.success(`Room id:${roomId} is copied`);
+    }).catch(err => {
+      toast.error("Room id cannot be copied");
+    });
+  };
+
+  const leaveRoom = ()=> {
+    window.location = "/";
+  };
 
   return (
     <div className="container-fluid vh-100 text-light">
@@ -72,9 +98,9 @@ const EditorPage = () => {
             }}
             onClick={(e) => {
               e.preventDefault();
-              console.log('Image clicked');
-              window.location = '/';
-              return <Navigate to='/'  replace={true}/>
+              console.log("Image clicked");
+              window.location = "/";
+              return <Navigate to="/" replace={true} />;
             }}
           />
           <hr />
@@ -86,12 +112,22 @@ const EditorPage = () => {
           <div className="mt-auto d-flex flex-column gap-2">
             <hr />
             {/* Margin top auto set's it at down */}
-            <button className="btn btn-success">Copy Room Id</button>
-            <button className="btn btn-danger">Leave room</button>
+            <button className="btn btn-success" onClick={copyRoomId}>
+              Copy Room Id
+            </button>
+            <button className="btn btn-danger" onClick={leaveRoom}>
+              Leave room
+            </button>
           </div>
         </section>
         <section className="col-10 col-md-10 text-light d-flex flex-column h-100">
-          <Editor />
+          <Editor
+            socketRef={socketRef}
+            roomId={params.roomId}
+            onCodeChange={(code) => {
+              codeRef.current = code;
+            }}
+          />
         </section>
       </div>
     </div>

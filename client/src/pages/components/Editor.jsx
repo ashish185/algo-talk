@@ -5,8 +5,9 @@ import "codemirror/addon/edit/closetag";
 import "codemirror/addon/edit/closebrackets";
 import "codemirror/lib/codemirror.css";
 import CodeMirror from "codemirror";
+import ACTIONS from "../../client-actions";
 
-function Editor({ socketRef, roomId, onCodeChange }) {
+function Editor({ socketRef = {}, roomId, onCodeChange }) {
   const editorRef = useRef(null);
 
   useEffect(() => {
@@ -20,10 +21,21 @@ function Editor({ socketRef, roomId, onCodeChange }) {
         lineNumbers: true,
       });
       if (editorRef.current) {
-        editorRef.current.setSize(null, '100%');
+        editorRef.current.setSize(null, "100%");
       }
+      editorRef.current.on("change", (instance, changes) => {
+        // console.log("changes", instance ,  changes );
+        const { origin } = changes; // type btayega type of event
+        const code = instance.getValue(); // code has value which we write
+        onCodeChange(code);
+        if (origin !== "setValue") {
+          socketRef.current.emit(ACTIONS.CODE_CHANGE, {
+            roomId,
+            code,
+          });
+        }
+      });
     };
-  
 
     initCodeMirror();
 
@@ -34,6 +46,19 @@ function Editor({ socketRef, roomId, onCodeChange }) {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (socketRef.current) {
+      socketRef.current.on(ACTIONS.CODE_CHANGE , ({ code }) => {
+        if (code !== null) {
+          editorRef.current.setValue(code);
+        }
+      });
+    }
+    return () => {
+      socketRef.current.off(ACTIONS.CODE_CHANGE);
+    };
+  }, [socketRef.current]);
 
   return (
     <div style={{ height: "100%" }}>
