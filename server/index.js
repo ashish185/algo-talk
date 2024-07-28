@@ -1,6 +1,9 @@
 import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
+import { fileURLToPath } from 'url';
+import path, { dirname } from 'path';
+
 const ACTIONS = {
     JOIN: "join",
     JOINED: "joined",
@@ -8,9 +11,9 @@ const ACTIONS = {
     CODE_CHANGE: "code-change",
     SYNC_CODE: "sync-code",
     LEAVE: "leave",
-  };
-
-const httpServer = http.createServer(express());
+};
+const app = express();
+const httpServer = http.createServer(app);
 const io = new Server(httpServer);
 
 const socketIdUserNameMap = {};
@@ -24,6 +27,28 @@ const getAllConnectedUserName = (roomId) => {
     }));
     return mappedArr;
 }
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+console.log(__dirname);
+console.log(__filename)
+
+const dir = __dirname.split('server').join('');
+console.log('dir', dir);
+
+console.log('process.env.ENVIRONMENT', process.env.ENVIRONMENT);
+if (process.env.ENVIRONMENT === "production") {
+  app.use(express.static(path.join(dir, "/client/build")));
+
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve(dir, "client", "build", "index.html"))
+  );
+} else {
+  app.get("/", (req, res) => {
+    res.send("API is running..");
+  });
+}
+
 
 io.on('connection', (socket) => {
     socket.on('join', ({ roomId, userName }) => {
