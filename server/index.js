@@ -37,7 +37,8 @@ const dir = __dirname.split('server').join('');
 console.log('dir', dir);
 
 console.log('process.env.ENVIRONMENT', process.env.ENVIRONMENT);
-if (process.env.ENVIRONMENT === "production") {
+//if (process.env.ENVIRONMENT === "production") {
+if ("production") {
   app.use(express.static(path.join(dir, "/client/build")));
 
   app.get("*", (req, res) =>
