@@ -34,7 +34,7 @@ console.log(__filename)
 
 const dir = __dirname.split('server').join('');
 console.log('dir', dir);
-
+console.error('**********************process.env.ENVIRONMENT', process.env.ENVIRONMENT);
 console.log('process.env.ENVIRONMENT', process.env.ENVIRONMENT);
 //if (process.env.ENVIRONMENT === "production") {
 if ("production") {
