@@ -3,7 +3,6 @@ import http from 'http';
 import { Server } from 'socket.io';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
-
 const ACTIONS = {
     JOIN: "join",
     JOINED: "joined",
@@ -39,7 +38,7 @@ console.log('dir', dir);
 console.log('process.env.ENVIRONMENT', process.env.ENVIRONMENT);
 //if (process.env.ENVIRONMENT === "production") {
 if ("production") {
-  app.use(express.static(path.join(dir, "/client/build")));
+  app.use(express.static(path.join(dir, "../client/build")));
 
   app.get("*", (req, res) =>
     res.sendFile(path.resolve(dir, "client", "build", "index.html"))
