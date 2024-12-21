@@ -36,18 +36,26 @@ const dir = __dirname.split('server').join('');
 console.log('dir', dir);
 console.error('**********************process.env.ENVIRONMENT', process.env.ENVIRONMENT);
 console.log('process.env.ENVIRONMENT', process.env.ENVIRONMENT);
-//if (process.env.ENVIRONMENT === "production") {
-if ("production") {
-  app.use(express.static(path.join(dir, "../client/build")));
 
-  app.get("*", (req, res) =>
+app.use(express.static(path.join(dir, "../client/build")));
+
+// Handle requests by serving index.html for all routes
+app.get('*', (req, res) => {
     res.sendFile(path.resolve(dir, "client", "build", "index.html"))
-  );
-} else {
-  app.get("/", (req, res) => {
-    res.send("API is running..");
-  });
-}
+});
+
+//if (process.env.ENVIRONMENT === "production") {
+// if ("production") {
+//   app.use(express.static(path.join(dir, "../client/build")));
+
+//   app.get("*", (req, res) =>
+//     res.sendFile(path.resolve(dir, "client", "build", "index.html"))
+//   );
+// } else {
+//   app.get("/", (req, res) => {
+//     res.send("API is running..");
+//   });
+// }
 
 
 io.on('connection', (socket) => {
