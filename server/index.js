@@ -3,6 +3,7 @@ import http from 'http';
 import { Server } from 'socket.io';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
+
 const ACTIONS = {
     JOIN: "join",
     JOINED: "joined",
@@ -29,35 +30,25 @@ const getAllConnectedUserName = (roomId) => {
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+console.log(__dirname);
+console.log(__filename)
 
 const dir = __dirname.split('server').join('');
 console.log('dir', dir);
-// console.error('**********************process.env.ENVIRONMENT', process.env.ENVIRONMENT);
+
 console.log('process.env.ENVIRONMENT', process.env.ENVIRONMENT);
-
-console.log('path.join(dir, "../client/build"))',path.join(dir, "../client/build"));
-
-console.log('path', path);
-
-app.use(express.static(path.join(dir, "../client/build")));
-
-// Handle requests by serving index.html for all routes
-app.get('*', (req, res) => {
-    res.sendFile(path.resolve(dir, "client", "build", "index.html"))
-});
-
 //if (process.env.ENVIRONMENT === "production") {
-// if ("production") {
-//   app.use(express.static(path.join(dir, "../client/build")));
+if ("production") {
+  app.use(express.static(path.join(dir, "/client/build")));
 
-//   app.get("*", (req, res) =>
-//     res.sendFile(path.resolve(dir, "client", "build", "index.html"))
-//   );
-// } else {
-//   app.get("/", (req, res) => {
-//     res.send("API is running..");
-//   });
-// }
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve(dir, "client", "build", "index.html"))
+  );
+} else {
+  app.get("/", (req, res) => {
+    res.send("API is running..");
+  });
+}
 
 
 io.on('connection', (socket) => {
