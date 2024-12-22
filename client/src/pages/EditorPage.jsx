@@ -113,7 +113,7 @@ const EditorPage = () => {
             <hr />
             {/* Margin top auto set's it at down */}
             <button className="btn btn-success" onClick={copyRoomId}>
-              Copy Room Id
+              Copy Room Id222222222222222222
             </button>
             <button className="btn btn-danger" onClick={leaveRoom}>
               Leave room

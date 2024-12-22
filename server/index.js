@@ -29,13 +29,15 @@ const getAllConnectedUserName = (roomId) => {
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-console.log(__dirname);
-console.log(__filename)
 
 const dir = __dirname.split('server').join('');
 console.log('dir', dir);
-console.error('**********************process.env.ENVIRONMENT', process.env.ENVIRONMENT);
+// console.error('**********************process.env.ENVIRONMENT', process.env.ENVIRONMENT);
 console.log('process.env.ENVIRONMENT', process.env.ENVIRONMENT);
+
+console.log('path.join(dir, "../client/build"))',path.join(dir, "../client/build"));
+
+console.log('path', path);
 
 app.use(express.static(path.join(dir, "../client/build")));
 
