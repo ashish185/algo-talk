@@ -1,8 +1,0 @@
-{
-    "name": "project-root",
-    "version": "1.0.0",
-    "scripts": {
-      "install": "npm install --prefix server"
-    }
-  }
-  
