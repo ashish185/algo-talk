@@ -2,6 +2,14 @@
   "version": 2,
   "builds": [
     {
+      "src": "server/package.json",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "client/package.json",
+      "use": "@vercel/static-build"
+    },
+    {
       "src": "server/index.js",
       "use": "@vercel/node"
     }
@@ -11,6 +19,5 @@
       "src": "/(.*)",
       "dest": "server/index.js"
     }
-  ],
-  "buildCommand": "npm install --prefix server && npm install --prefix client && npm run build --prefix client"
+  ]
 }
